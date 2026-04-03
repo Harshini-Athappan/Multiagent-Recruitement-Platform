@@ -1,0 +1,88 @@
+=============================================================================
+RECRUITMENT ORCHESTRATION PLATFORM — SYSTEM FUNCTIONALITY DOCUMENTATION
+=============================================================================
+
+Welcome to the Multi-Agent Recruitment System. This document explains the core 
+functionalities and the collaborative agent workflow that powers this platform.
+
+1. SYSTEM OVERVIEW
+------------------
+The platform uses an autonomous multi-agent architecture to handle the end-to-end 
+recruitment lifecycle. Unlike traditional ATS (Applicant Tracking Systems), this 
+system acts as a "digital recruiter" that reasons through each stage, coordinates 
+data between agents, and enforces human-in-the-loop approvals.
+
+2. THE AGENT SQUAD & THEIR ROLES
+--------------------------------
+The system is composed of 7 specialized AI agents:
+
+• Stage 1: JD Agent (Job Description Intake)
+  - Function: Takes raw text or PDF files and extracts structured data (Title, 
+    Skills, Experience, Salary).
+  - Value: Eliminates manual data entry and ensures consistent job requirements.
+
+• Stage 2: Candidate Search Agent
+  - Function: Queries the candidate database to find profiles that match at 
+    least 40% of the extracted JD skills.
+  - Value: Rapidly identifies a shortlist of potential hires from large pools.
+
+• Stage 3: Scoring Agent
+  - Function: Applies a calculated rubric (Experience 30%, Skills 40%, etc.) 
+    to rank candidates numerically.
+  - Value: Objectively prioritizes candidates based on data, not bias.
+
+• Stage 4: Scheduling Agent
+  - Function: Checks interviewer availability and proposes 3 conflict-free 
+    time slots for interviews.
+  - Value: Automates the "scheduling ping-pong" between recruiters and candidates.
+
+• Stage 5: Feedback Agent (Interviewer Analysis)
+  - Function: Analyzes raw notes from interviewers and assigns a sentiment score 
+    (Positive/Negative) and a formal hire recommendation.
+  - Value: Quantifies subjective interview notes for easier decision-making.
+
+• Stage 6: Offer Agent (Unified Drafting)
+  - Function: Generates a legally-styled offer letter including salary, 
+    benefits, and start dates.
+  - Value: Creates a personalized, polished document ready for human review.
+
+• Stage 7: Evaluation Agent (Pipeline Closure)
+  - Function: Audits the entire conversational chain and generates a final report.
+  - Value: Provides a clean "audit trail" of why a hire was made.
+
+3. THE CORE WORKFLOW (How it all connects)
+------------------------------------------
+The system follows a state-machine logic (powered by LangGraph):
+
+A. JD Intake: The system starts once a JD is provided.
+B. Screening: Candidate Search and Scoring run autonomously.
+C. Human Breakpoint 1: The system pauses for the user to "Approve" the final 
+   shortlist.
+D. Interview Gap: The system schedules slots and waits for human confirmation.
+E. Integrated Review: Once interview feedback is saved, the system automatically 
+   performs Sentiment Analysis AND drafts the Offer Letter in parallel.
+F. Final Decision: The user reviews both the sentiment and the offer draft on 
+   a single screen and clicks "Send Final Offer".
+G. Dispatch: The system simulates sending the final email and moves to Evaluation.
+
+4. USER INTERFACE & INTERACTION
+-------------------------------
+• Streamlit Dashboard: A web-based "Command Center" where users can manage 
+  multiple active roles, see candidate rankings, and view the graph state.
+• Chat-Driven UI: Users can interact with the supervisor agent via text to 
+  ask questions or manually override stages (e.g., "add 10k to the salary").
+• Real-time Logging: All agent "thoughts" are visible to the user, providing 
+  full transparency into how AI decisions are being made.
+
+5. TECHNICAL ARCHITECTURE
+--------------------------
+• FastAPI: The engine that powers all REST endpoints.
+• LangGraph: The "brain" that coordinates the agent transitions and memory.
+• SQLite: The persistent memory that ensures your data isn't lost if the 
+  system restarts.
+• Groq LLMs: The high-performance intelligence layer (Llama-3 models) that 
+  powers the agent reasoning.
+
+=============================================================================
+END OF DOCUMENTATION
+=============================================================================
