@@ -116,38 +116,6 @@ Method	Endpoint	Returns
 🤖 Agent Prompts
 All agent system prompts are stored in prompts/agent_prompts.json. You can tune them without touching code.
 
-📁 Project Structure
-recruitment_platform/
-├── agents/
-│   ├── supervisor.py           # Orchestrator (LangChain routing)
-│   ├── jd_agent.py             # Stage 1: JD Intake & Parsing
-│   ├── candidate_search_agent.py  # Stage 2: Candidate Sourcing
-│   ├── scoring_agent.py        # Stage 3: Candidate Scoring
-│   ├── scheduling_agent.py     # Stage 4: Interview Scheduling
-│   ├── feedback_agent.py       # Stage 5: Feedback & Sentiment
-│   ├── offer_agent.py          # Stage 6: Offer Letter Drafting
-│   └── evaluation_agent.py     # Stage 7: Pipeline Closure
-├── api/
-│   └── main.py                 # FastAPI app + all endpoints
-├── core/
-│   ├── config.py               # Settings (pydantic-settings)
-│   ├── llm.py                  # Groq LLM factory
-│   └── state_store.py          # Thread-safe pipeline store
-├── models/
-│   └── schemas.py              # All Pydantic models
-├── prompts/
-│   └── agent_prompts.json      # All agent system prompts
-├── tests/
-│   └── test_agents.py          # Pytest test suite (40+ tests)
-├── utils/
-│   ├── file_parser.py          # PDF/TXT extraction
-│   ├── mock_data.py            # Candidate database
-│   └── prompt_loader.py        # JSON prompt loader
-├── .env.example                # Environment template
-├── requirements.txt
-├── run.py                      # Entry point
-└── README.md
-
 🔑 Key Design Decisions
 
 - LangChain for Orchestration
