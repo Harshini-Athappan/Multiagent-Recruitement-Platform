@@ -1,37 +1,10 @@
 A fully functional multi-agent AI recruitment pipeline built with LangChain, Groq LLMs, and FastAPI. It automates the end-to-end hiring workflow through a conversational interface.
 
-🏗️ Architecture
-┌─────────────────────────────────────────────────────────────┐
-│                    FastAPI REST API                          │
-│  /jd/upload  /chat  /pipelines/*  /dashboard  /approve      │
-└─────────────────────────┬───────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Recruitment Supervisor (Orchestrator)           │
-│                                                              │
-│  • Intent classification (LLM-assisted)                      │
-│  • Stage-machine routing                                      │
-│  • Human escalation management                               │
-│  • Pipeline state coordination                               │
-└──────┬──────┬──────┬──────┬──────┬──────┬──────────────────┘
-       │      │      │      │      │      │
-       ▼      ▼      ▼      ▼      ▼      ▼
-   ┌──────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐ ┌──────┐
-   │  JD  │ │Src │ │Scr │ │Sch │ │Fdb │ │Ofr │ │Eval  │
-   │Agent │ │Agt │ │Agt │ │Agt │ │Agt │ │Agt │ │Agent │
-   └──────┘ └────┘ └────┘ └────┘ └────┘ └────┘ └──────┘
-       │      │      │      │      │      │         │
-       └──────┴──────┴──────┴──────┴──────┴─────────┘
-                          │
-                          ▼
-              ┌───────────────────────┐
-              │   Pipeline State Store │
-              │   (In-memory / Redis)  │
-              └───────────────────────┘
-🔄 Pipeline Flow
+Pipeline Flow
+
 JD_INTAKE → CANDIDATE_SEARCH → SCORING → SCHEDULING
     → FEEDBACK → OFFER → EVALUATION → COMPLETED
+    
 Stage	Agent	Responsibility
 1	JD Agent	Parse PDF/text/NL job descriptions into structured JSON
 2	Candidate Search Agent	Source candidates with ≥40% skill match
@@ -45,17 +18,19 @@ Prerequisites: Python 3.11+
 
 Clone and navigate:
 
-git clone https://github.com/your-org/recruitment-platform.git
+git clone https://github.com/{your-org}/recruitment-platform.git
 cd recruitment-platform
-Setup virtual environment:
 
+Setup virtual environment:
 python -m venv venv
+
 # Linux/macOS
 source venv/bin/activate
+
 # Windows
 .\venv\Scripts\activate
-Install dependencies:
 
+Install dependencies:
 pip install -r requirements.txt
 Configure environment:
 
@@ -87,44 +62,57 @@ Streamlit UI (Primary Interface)
 The easiest way to use the platform is through the Streamlit dashboard:
 
 Open http://localhost:8501
-Use the "➕ Start New Recruitment Role" button in the sidebar to begin a pipeline.
-Paste a job description in the text box and follow the autonomous conversational flow.
-Interact with the LLM directly through the chat input at the bottom to progress/approve stages (e.g., type "approve" when prompted).
-Switch between multiple active roles using the sidebar dashboard.
-FastAPI Swagger (API Testing)
+
+- Use the "➕ Start New Recruitment Role" button in the sidebar to begin a pipeline.
+- Paste a job description in the text box and follow the autonomous conversational flow.
+- Interact with the LLM directly through the chat input at the bottom to progress/approve stages (e.g., type "approve" when prompted).
+- Switch between multiple active roles using the sidebar dashboard.
+- FastAPI Swagger (API Testing)
+
 You can test the headless endpoints directly via Swagger:
 
-Open http://localhost:8016/docs
-Use POST /jd/text to submit a Job Description. Copy the returned pipeline_id.
-Use POST /chat with {"pipeline_id": "...", "message": "proceed"} to advance the multi-agent pipeline.
-View pipeline state and metrics using the GET /pipelines and GET /pipelines/{id}/status endpoints.
+- Open http://localhost:8016/docs
+- Use POST /jd/text to submit a Job Description. Copy the returned pipeline_id.
+- Use POST /chat with {"pipeline_id": "...", "message": "proceed"} to advance the multi-agent pipeline.
+- View pipeline state and metrics using the GET /pipelines and GET /pipelines/{id}/status endpoints.
+
+
 📡 API Reference
+
 Core Endpoints
+
 Method	Endpoint	Description
-POST	/jd/upload	Upload PDF/TXT job description
-POST	/jd/text	Submit JD as text
-POST	/chat	Conversational pipeline advancement
-GET	/dashboard	Aggregated metrics for all pipelines
-GET	/pipelines	List all pipelines
-GET	/pipelines/{id}	Get full pipeline state
+- POST	/jd/upload	Upload PDF/TXT job description
+- POST	/jd/text	Submit JD as text
+- POST	/chat	Conversational pipeline advancement
+- GET	/dashboard	Aggregated metrics for all pipelines
+- GET	/pipelines	List all pipelines
+- GET	/pipelines/{id}	Get full pipeline state
+
 Stage-Specific Endpoints
+
 Method	Endpoint	Stage
-POST	/pipelines/{id}/advance	Auto-advance to next stage
-POST	/pipelines/{id}/search-candidates	Stage 2
-POST	/pipelines/{id}/score-candidates	Stage 3
-POST	/pipelines/{id}/schedule-interviews	Stage 4
-POST	/pipelines/{id}/collect-feedback	Stage 5
-POST	/pipelines/{id}/generate-offers	Stage 6
-POST	/pipelines/{id}/evaluate	Stage 7
+- POST	/pipelines/{id}/advance	Auto-advance to next stage
+- POST	/pipelines/{id}/search-candidates	Stage 2
+- POST	/pipelines/{id}/score-candidates	Stage 3
+- POST	/pipelines/{id}/schedule-interviews	Stage 4
+- POST	/pipelines/{id}/collect-feedback	Stage 5
+- POST	/pipelines/{id}/generate-offers	Stage 6
+- POST	/pipelines/{id}/evaluate	Stage 7
+
+
 Data Endpoints
+
 Method	Endpoint	Returns
-GET	/pipelines/{id}/candidates	Candidates + scores
-GET	/pipelines/{id}/schedules	Interview schedules
-GET	/pipelines/{id}/feedback	Feedback + sentiment
-GET	/pipelines/{id}/offers	Offer summaries
-GET	/pipelines/{id}/offers/{offer_id}/letter	Full offer text
-GET	/pipelines/{id}/history	Conversation history
-POST	/pipelines/{id}/approve?decision=approve	Human approval
+- GET	/pipelines/{id}/candidates	Candidates + scores
+- GET	/pipelines/{id}/schedules	Interview schedules
+- GET	/pipelines/{id}/feedback	Feedback + sentiment
+- GET	/pipelines/{id}/offers	Offer summaries
+- GET	/pipelines/{id}/offers/{offer_id}/letter	Full offer text
+- GET	/pipelines/{id}/history	Conversation history
+- POST	/pipelines/{id}/approve?decision=approve	Human approval
+
+
 🤖 Agent Prompts
 All agent system prompts are stored in prompts/agent_prompts.json. You can tune them without touching code.
 
@@ -159,38 +147,44 @@ recruitment_platform/
 ├── requirements.txt
 ├── run.py                      # Entry point
 └── README.md
+
 🔑 Key Design Decisions
-LangChain for Orchestration
-ChatGroq via langchain-groq for all LLM calls
-SystemMessage / HumanMessage for structured prompting
-Supervisor uses LLM for intent classification, then deterministic routing
-Each agent maintains its own conversation context
-Groq LLM (llama-3.3-70b-versatile)
-Fast inference (< 2s per agent call typical)
-Free tier sufficient for development
-Model configurable via .env
-State Management
-PipelineState Pydantic model as single source of truth
-Thread-safe in-memory store (PipelineStore)
-Full conversation history per pipeline
-Stage history tracking for audit
-Scoring Rubric (deterministic)
-Overall Score = 0.40 × Skill Match
+
+- LangChain for Orchestration
+- ChatGroq via langchain-groq for all LLM calls
+- SystemMessage / HumanMessage for structured prompting
+- Supervisor uses LLM for intent classification, then deterministic routing
+- Each agent maintains its own conversation context
+- Groq LLM (llama-3.3-70b-versatile)
+- Fast inference (< 2s per agent call typical)
+- Free tier sufficient for development
+- Model configurable via .env
+- State Management
+- PipelineState Pydantic model as single source of truth
+- Thread-safe in-memory store (PipelineStore)
+- Full conversation history per pipeline
+- Stage history tracking for audit
+- Scoring Rubric (deterministic)
+- Overall Score = 0.40 × Skill Match
               + 0.30 × Experience Match
               + 0.15 × Education Match
               + 0.15 × Preferred Skills
+              
 Conflict Detection
-15-minute buffer between consecutive interviews
-Business hours: Mon–Fri, 09:00–18:00
-Auto-propose 3 alternatives on conflict
+- 15-minute buffer between consecutive interviews
+- Business hours: Mon–Fri, 09:00–18:00
+- Auto-propose 3 alternatives on conflict
+
+
 🔮 Production Roadmap
- PostgreSQL / Redis backend for state persistence
- OAuth2 authentication
- ATS integration (Greenhouse, Lever, Workday)
- Email notifications (SendGrid/SES)
- Calendar integration (Google Calendar API)
- React dashboard frontend
- LangGraph for complex multi-step workflows
- Async job queue (Celery + Redis)
+- PostgreSQL / Redis backend for state persistence
+- OAuth2 authentication
+- ATS integration (Greenhouse, Lever, Workday)
+- Email notifications (SendGrid/SES)
+- Calendar integration (Google Calendar API)
+- React dashboard frontend
+- LangGraph for complex multi-step workflows
+- Async job queue (Celery + Redis)
+- 
 📄 License
-MIT License — see LICENSE file.
+- MIT License — see LICENSE file.
